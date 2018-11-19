@@ -21,7 +21,13 @@ namespace BlobPathFixerApp
 			var storageConnString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
 
 			// URL-decode the blob path and replace spaces with underscores
-			string targetBlobPath = "xlsm/" + WebUtility.UrlDecode(name).Replace(" ", "_");
+			string targetBlobPath;
+
+			if (name.EndsWith(".xlsm"))
+				targetBlobPath = "xlsm/" + WebUtility.UrlDecode(name).Replace(" ", "_");
+			else
+				targetBlobPath = "files/" + WebUtility.UrlDecode(name).Replace(" ", "_");
+
 			log.LogInformation($"TargetBlob Path: {targetBlobPath}");
 
 			CloudStorageAccount sa = CloudStorageAccount.Parse(storageConnString);
