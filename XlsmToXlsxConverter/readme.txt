@@ -1,0 +1,1 @@
+This is an Azure function with blob input trigger and blob output. It converts an Excel macro-enabled spreadsheet (.xslm) to an Excel spreadsheet (.xlsx). It uses the Open XML SDK.
