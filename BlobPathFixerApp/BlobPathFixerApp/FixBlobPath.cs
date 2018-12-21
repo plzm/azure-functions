@@ -24,9 +24,9 @@ namespace BlobPathFixerApp
 			string targetBlobPath;
 
 			if (name.EndsWith(".xlsm"))
-				targetBlobPath = "xlsm/" + WebUtility.UrlDecode(name).Replace(" ", "_");
+				targetBlobPath = "files-interim/" + WebUtility.UrlDecode(name).Replace(" ", "_");
 			else
-				targetBlobPath = "files/" + WebUtility.UrlDecode(name).Replace(" ", "_");
+				targetBlobPath = "files-stage/" + WebUtility.UrlDecode(name).Replace(" ", "_");
 
 			log.LogInformation($"TargetBlob Path: {targetBlobPath}");
 
