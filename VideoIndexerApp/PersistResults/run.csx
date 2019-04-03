@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using pelazem.azure.storage;
 using pelazem.azure.cognitive.videoindexer;
@@ -11,8 +13,7 @@ using pelazem.azure.cognitive.videoindexer;
 public static async Task Run(HttpRequest req, ILogger log)
 {
     // App settings
-	string storageAccountName = Environment.GetEnvironmentVariable("StorageAccountName");
-	string storageAccountKey = Environment.GetEnvironmentVariable("StorageAccountKey");
+	string storageConnString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
 	string policyName = Environment.GetEnvironmentVariable("PolicyName");
 	string containerNameVideoResults = Environment.GetEnvironmentVariable("ContainerNameVideoResults");
 
@@ -21,8 +22,7 @@ public static async Task Run(HttpRequest req, ILogger log)
 	string videoIndexerApiKey = Environment.GetEnvironmentVariable("VideoIndexerApiKey");
 	string videoIndexerApiAzureRegion = Environment.GetEnvironmentVariable("VideoIndexerApiAzureRegion");
 
-	log.LogInformation(nameof(storageAccountName) + "=" + storageAccountName);
-	log.LogInformation(nameof(storageAccountKey) + "=" + storageAccountKey);
+	log.LogInformation(nameof(storageConnString) + "=" + storageConnString);
 	log.LogInformation(nameof(policyName) + "=" + policyName);
 	log.LogInformation(nameof(containerNameVideoResults) + "=" + containerNameVideoResults);
 
@@ -55,8 +55,9 @@ public static async Task Run(HttpRequest req, ILogger log)
     string videoJson = JsonConvert.SerializeObject(video, settings);
 
     // Write the JSON to storage
-    StorageConfig config = new StorageConfig() { ContainerName = containerNameVideoResults, StorageAccountName = storageAccountName, StorageAccountKey = storageAccountKey };
     ServiceClient storageClient = new ServiceClient();
+	CloudStorageAccount storageAccount = storageClient.GetStorageAccount(storageConnString);
+    string sasUrl = await storageClient.GetBlobSAPUrlFromBlobUrlAsync(storageAccount, containerNameVideoResults, url, policyName);
 
     bool result = await storageClient.UploadStringAsync(config, videoJson, videoName + ".txt");
     log.LogInformation($"{nameof(result)} = {result.ToString()}");
